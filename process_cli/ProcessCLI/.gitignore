@@ -1,0 +1,12 @@
+bin/**
+out/**
+obj/**
+
+.idea
+.vscode
+.vs
+*.suo
+*.ntvs*
+*.sln
+*.njsproj
+*.sw?
