@@ -4,7 +4,8 @@ import routes from './routes';
 import { connectDb } from './models';
 import { clearCollections, fillMongoWithDefaultData } from './default-data';
 import bodyParser from 'body-parser';
-import './passport';
+import passport from 'passport';
+import { InitPassport } from './passport.init';
 
 const config_result = dotenv.config();
 if (config_result.error) {
@@ -16,9 +17,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+InitPassport();
+
 app.use('/auth', routes.auth);
-app.use('/tasks', routes.tasks);
-app.use('/pipelines', routes.pipelines);
+app.use('/tasks', passport.authenticate('jwt', {session: false}), routes.tasks);
+app.use('/pipelines', passport.authenticate('jwt', {session: false}), routes.pipelines);
 
 app.get('/', (req, res) => {
   res.send(process.env.VERSION);

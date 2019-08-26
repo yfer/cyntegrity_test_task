@@ -3,6 +3,8 @@ const router = Router();
 import Task from '../models/task';
 
 router.get('/', async (req, res) => {
+  const userid = req.user;
+  console.log(userid);
   var tasks = await Task.find();
   return res.json(tasks);
 }).post( async (req, res) => {
