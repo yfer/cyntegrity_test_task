@@ -4,11 +4,6 @@ import jwt from 'jsonwebtoken';
 
 const router = Router();
 
-// router.get('/logout', async (req, res) => {
-//   var tasks = await Task.find();
-//   return res.json(tasks);
-// });
-
 router.post('/login', (req, res, next) => {
   const { body: user } = req;
 
