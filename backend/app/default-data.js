@@ -1,5 +1,4 @@
 import models from './models';
-import "core-js/stable";
 
 export async function fillMongoWithDefaultData() {
   const users = ['1', '2', '3'].map(id => new models.User({

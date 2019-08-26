@@ -9,9 +9,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findByLogin = async function (login) {
+userSchema.statics.findByUsernameAndPassword = async function (username, password) {
   const user = await this.findOne({
-    username: login,
+    username: username,
+    password: password
   });
   return user;
 };
