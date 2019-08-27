@@ -23,7 +23,7 @@
     </md-speed-dial>
 
 
-    <md-dialog-prompt
+    <!-- <md-dialog-prompt
       :md-active.sync="showCreateDialog"
       v-model="newTaskName"
       md-title="Task name?"
@@ -32,10 +32,10 @@
       md-cancel-text="Cancel"
       md-confirm-text="Done" 
       @md-confirm="createTask()"
-      />
+      /> -->
 
-    <!-- todo: return to this realization due to inability of md-dialog-prompt validate input parameters
-      <CreateTaskDialog :showCreateDialog="showCreateDialog"/> -->
+      <!-- todo: figure out more loose coupled wayt to handle passing data to and from dialog -->
+      <CreateTaskDialog :md-active.sync="showCreateDialog" v-model="newTaskModel" @md-create="createTask()" @md-cancel="cancelCreateTask()"/>
   </div>
 </template>
 
@@ -49,11 +49,18 @@
 </style>
 
 <script>
-// import CreateTaskDialog from "@/components/CreateTaskDialog.vue";
+import CreateTaskDialog from "@/components/CreateTaskDialog.vue";
 import { HTTP } from "../http-common";
 import auth from '../auth';
 
 const taskSortRule = (a,b) => a._id > b._id;
+const url = "tasks/";
+function getDefaultTaskModel() {
+  return {
+    name: "",
+    avarageTimeInSeconds: 1
+  };
+}
 
 export default {
   data () {
@@ -61,17 +68,17 @@ export default {
       tasks: [],
       userid: auth.getUserId(),
       showCreateDialog: false,
-      newTaskName: null
+      newTaskModel: getDefaultTaskModel()
     }
   },
-  // components: {
-  //   CreateTaskDialog
-  // },
+  components: {
+    CreateTaskDialog
+  },
   beforeRouteEnter (to, from, next) {
-    HTTP().get("tasks").then(resp => {
+    HTTP().get(url).then(resp => {
       next(vm => vm.setTasks(resp.data));
     }).catch((e)=>{
-      console.log(e);
+      console.log(e); //todo: proper error handling and display
     });
   },
   methods: {
@@ -79,24 +86,27 @@ export default {
       this.tasks = tasks.sort(taskSortRule)
     },
     deleteTask (taskid) {
-      HTTP().delete("tasks/" + taskid).then(resp => {
+      HTTP().delete(url + taskid).then(resp => {
+        //todo: use map instead of array, O(1) instead of O(N)
         this.tasks = this.tasks.filter(t=>t._id != taskid).sort(taskSortRule);
       }).catch((e)=>{
-        console.log(e);
+        console.log(e); //todo: proper error handling and display
       })
     },
     showCreateTaskDialog() {
       this.showCreateDialog = true;
     },
+    cancelCreateTask() {
+      this.newTaskModel = getDefaultTaskModel();
+    },
     createTask() {
-      HTTP().post("tasks/", { name: this.newTaskName }).then(resp => {
-        console.log(resp);
+      HTTP().post(url, this.newTaskModel).then(resp => {
         this.tasks.push(resp.data);
         this.tasks.sort(taskSortRule);
       }).catch((e)=>{
-        console.log(e);
+        console.log(e); //todo: proper error handling and display
       }).finally(()=> {
-        this.newTaskName = null;
+        this.newTaskModel = getDefaultTaskModel();
       });
     }
   }

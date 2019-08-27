@@ -61,7 +61,6 @@
     data: () => ({
       menuVisible: true,
       isLoggedIn: auth.loggedIn(),
-      user: {},
     }),
     created: function () {
       auth.onChange = loggedIn => {
