@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import routes from './routes';
+import cors from 'cors';
 import { connectDb } from './models';
 import { clearCollections, fillMongoWithDefaultData } from './default-data';
 import bodyParser from 'body-parser';
@@ -14,6 +15,7 @@ if (config_result.error) {
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
