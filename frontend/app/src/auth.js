@@ -1,3 +1,5 @@
+import { HTTP } from "./http-common";
+
 /* globals localStorage */
 
 export default {
@@ -8,7 +10,7 @@ export default {
       this.onChange(true);
       return;
     }
-    pretendRequest(username, password, res => {
+    loginRequest(username, password, res => {
       if (res.authenticated) {
         localStorage.token = res.token;
         if (cb) cb(true);
@@ -37,15 +39,21 @@ export default {
   onChange() {}
 };
 
-function pretendRequest(username, password, cb) {
-  setTimeout(() => {
-    if (username === "username1" && password === "password1") {
+function loginRequest(username, password, cb) {
+  HTTP()
+    .post("auth/login", {
+      username: username,
+      password: password
+    })
+    .then(resp => {
       cb({
         authenticated: true,
-        token: Math.random().toString(36).substring(7)
+        token: resp.data.token
       });
-    } else {
-      cb({ authenticated: false });
-    }
-  }, 0);
+    })
+    .catch(() => {
+      cb({
+        authenticated: false
+      });
+    });
 }
