@@ -5,6 +5,9 @@ const taskSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  avarageTimeInSeconds: {
+    type: Number
+  }
 });
 
 const Task = mongoose.model('Task', taskSchema);

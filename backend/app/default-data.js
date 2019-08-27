@@ -8,6 +8,7 @@ export async function fillMongoWithDefaultData() {
   const size = users.length;
   const tasks = [0,1,2,3,4,5,6,7,8,9,10].map(pos => new models.Task({
     name: users[pos%size].username + ' task' + pos,
+    avarageTimeInSeconds: 2,
     user: users[pos%size].id
   }));
   await models.User.insertMany(users);

@@ -4,6 +4,8 @@
       <md-card-area>
         <md-card-header>
           <span class="md-title">{{ task.name }}</span>
+          <br/>
+          <span class="md-card-subtitle">{{ task.avarageTimeInSeconds }} seconds</span>
         </md-card-header>
 
         <md-card-actions>
