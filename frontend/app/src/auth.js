@@ -12,6 +12,7 @@ export default {
     }
     loginRequest(username, password, res => {
       if (res.authenticated) {
+        localStorage.userid = res.userid;
         localStorage.token = res.token;
         if (cb) cb(true);
         this.onChange(true);
@@ -22,12 +23,17 @@ export default {
     });
   },
 
+  getUserId() {
+    return localStorage.userid;
+  },
+
   getToken() {
     return localStorage.token;
   },
 
   logout(cb) {
     delete localStorage.token;
+    delete localStorage.userid;
     if (cb) cb();
     this.onChange(false);
   },
@@ -48,6 +54,7 @@ function loginRequest(username, password, cb) {
     .then(resp => {
       cb({
         authenticated: true,
+        userid: resp.data.id,
         token: resp.data.token
       });
     })

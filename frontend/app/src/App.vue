@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <md-app style="min-height: 100vh;">
+    <md-app style="min-height: 100vh; max-height: 100vh" md-waterfall md-mode="fixed">
       <md-app-toolbar class="md-primary">
         <md-button class="md-icon-button" @click="toggleMenu" v-if="!menuVisible">
           <md-icon>menu</md-icon>

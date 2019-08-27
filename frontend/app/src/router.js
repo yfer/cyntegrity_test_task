@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Home from "./views/Home.vue";
 import Tasks from "./views/Tasks.vue";
 import Pipelines from "./views/Pipelines.vue";
+import Pipeline from "./views/Pipeline.vue";
 import Login from "./views/Login.vue";
 import auth from "./auth";
 
@@ -52,7 +53,13 @@ var router = new Router({
       path: "/pipelines",
       name: "pipelines",
       meta: { requiresAuth: true, title: "Pipelines" },
-      component: Pipelines
+      component: Pipelines,
+      children: [
+        {
+          path: ":id",
+          component: Pipeline
+        }
+      ]
     }
   ]
 });
