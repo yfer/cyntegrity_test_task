@@ -53,13 +53,13 @@ var router = new Router({
       path: "/pipelines",
       name: "pipelines",
       meta: { requiresAuth: true, title: "Pipelines" },
-      component: Pipelines,
-      children: [
-        {
-          path: ":id",
-          component: Pipeline
-        }
-      ]
+      component: Pipelines
+    },
+    {
+      path: "/pipelines/:id",
+      name: "pipeline",
+      meta: { requiresAuth: true, title: "Pipeline" },
+      component: Pipeline
     }
   ]
 });

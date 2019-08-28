@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-card md-with-hover v-for="task in tasks" v-bind:key="task._id">
+    <md-card v-for="task in tasks" v-bind:key="task._id">
       <md-card-area>
         <md-card-header>
           <span class="md-title">{{ task.name }}</span>
@@ -22,18 +22,6 @@
       </md-speed-dial-target> 
     </md-speed-dial>
 
-
-    <!-- <md-dialog-prompt
-      :md-active.sync="showCreateDialog"
-      v-model="newTaskName"
-      md-title="Task name?"
-      md-input-maxlength="20"
-      md-input-placeholder="Enter task name..."
-      md-cancel-text="Cancel"
-      md-confirm-text="Done" 
-      @md-confirm="createTask()"
-      /> -->
-
       <!-- todo: figure out more loose coupled wayt to handle passing data to and from dialog -->
       <CreateTaskDialog :md-active.sync="showCreateDialog" v-model="newTaskModel" @md-create="createTask()" @md-cancel="cancelCreateTask()"/>
   </div>
@@ -52,8 +40,8 @@
 import CreateTaskDialog from "@/components/CreateTaskDialog.vue";
 import { HTTP } from "../http-common";
 import auth from '../auth';
+import { sortRule } from '../helpers';
 
-const taskSortRule = (a,b) => a._id > b._id;
 const url = "tasks/";
 function getDefaultTaskModel() {
   return {
@@ -83,12 +71,12 @@ export default {
   },
   methods: {
     setTasks (tasks) {
-      this.tasks = tasks.sort(taskSortRule)
+      this.tasks = tasks.sort(sortRule)
     },
     deleteTask (taskid) {
       HTTP().delete(url + taskid).then(resp => {
         //todo: use map instead of array, O(1) instead of O(N)
-        this.tasks = this.tasks.filter(t=>t._id != taskid).sort(taskSortRule);
+        this.tasks = this.tasks.filter(t=>t._id != taskid).sort(sortRule);
       }).catch((e)=>{
         console.log(e); //todo: proper error handling and display
       })
@@ -102,7 +90,7 @@ export default {
     createTask() {
       HTTP().post(url, this.newTaskModel).then(resp => {
         this.tasks.push(resp.data);
-        this.tasks.sort(taskSortRule);
+        this.tasks.sort(sortRule);
       }).catch((e)=>{
         console.log(e); //todo: proper error handling and display
       }).finally(()=> {
