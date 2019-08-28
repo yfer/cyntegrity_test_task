@@ -4,6 +4,8 @@ Test task for a job at https://Cyntegrity.com
 For start:
 1. Copy docker-compose.yaml file to a place where docker cli is available
 2. Change in it: services->backend->volumes from //var/run/docker.sock:/var/run/docker.sock to your docker socket location
+3. run docker-compose up -d
+4. navigate to port 80 of the host in the browser
 
 Remarks about my expirience:
 1. This is my first time with Vue.js and Express.js. (nor really, i've tried it back when in order to use node.js you had to compile it first.)
