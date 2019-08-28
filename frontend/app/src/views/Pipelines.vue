@@ -1,14 +1,7 @@
 <template>
   <div>
-    <div>
-      <p>
-        <ol>
-          <li>Run on pipeline</li>
-        </ol>
-      </p>
-    </div>
-    <md-card md-with-hover v-for="pipeline in pipelines" v-bind:key="pipeline._id">
-      <div @click="editPipeline(pipeline._id)">
+    <md-card v-for="pipeline in pipelines" v-bind:key="pipeline._id">
+      <div>
       <md-ripple>
         <md-card-area>
           <md-card-header>
@@ -121,6 +114,15 @@ export default {
       this.$router.push(url + pipelineid);
     },
     runPipeline(pipelineid) {
+      HTTP().post(url + pipelineid + '/run').then(resp => {
+        console.log(resp.data);
+        alert("Pipeline finished with result: " + resp.data + " seconds");
+        // this.pipeline = resp.data;
+      }).catch((e)=>{
+        console.log(e); //todo: proper error handling and display
+      }).finally(()=> {
+        this.addTaskId = null;
+      });
     }
   }
 }

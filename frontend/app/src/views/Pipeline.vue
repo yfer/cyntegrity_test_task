@@ -1,11 +1,5 @@
 <template>
   <div>
-    <p>
-      <ol>
-        <li>Run pipeline</li>
-      </ol>
-    </p>
-
     <md-card v-for="task in pipeline.children" v-bind:key="task._id">
       <md-card-area>
         <md-card-header>
@@ -101,8 +95,6 @@ export default {
       }).finally(()=> {
         this.addTaskId = null;
       });
-    },
-    runPipeline(pipelineid) {
     }
   }
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ProcessCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "mongodb://localhost:27017 backend-db 5d664a076248254fd8772f08"
+    }
+  }
+}

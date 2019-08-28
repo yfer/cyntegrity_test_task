@@ -65,16 +65,28 @@ router.post('/:pipelineId/run', async (req, res) => {
   var docker = new Docker({socketPath: process.env.DOCKER_SOCKET});
   
   try {
-    // todo: need handling of missing container, now just add container to docker-compose
+
+    var options = {
+      HostConfig: {
+        NetworkMode: "cyntegrity_internal"
+      }
+    };
+    // todo: need handling of missing container, for now just add container to docker-compose
     var writer = new Streams.WritableStream(); 
-    var container = await docker.run(process.env.CONTAINER_IMAGE_TO_RUN, [id], writer);
+    var container = await docker.run(process.env.CONTAINER_IMAGE_TO_RUN, 
+      [
+        process.env.MONGO_CONNECTION_STRING,  
+        process.env.MONGO_DB, 
+        id
+      ], 
+      writer, options);
     
     await container.wait();
     var result = writer.toString();
     await container.remove();
 
-
-    return res.send('Pipeline finished with result:' + result);
+    
+    return res.send(result);
   } catch(err) {
     return res.send(err);
   }

@@ -1,5 +1,9 @@
 version: "3.6"
 
+networks:
+
+  internal:
+
 services:
 
   mongo:
@@ -8,6 +12,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: backend-db
+    networks:
+      - internal
 
   mongo-express:
     image: mongo-express
@@ -17,29 +24,60 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    networks:
+      - internal
+    depends_on:
+      - mongo
       
+  # we should use envoy for such services, 
+  # to cover all internal structure from visitor and publish only one endpoint
+  # also it allows to scale horizontally and do load-balancing, which is great
+  # in stateless servicess like ours
   # envoy:
   #   build: ./envoy
   #   image: envoy
     
-  # frontend:
-  #   build: ./frontend
-  #   image: frontend
-  #   ports:
-  #     - 80:80
+  frontend:
+    # for local build
+    # build: ./frontend/app/
+    # image: frontend:master
+    
+    # pull image from store
+    image: gcr.io/cyntegrity/frontend:master
+    ports:
+      - 80:80
+    networks:
+      - internal
+    depends_on:
+      - backend
       
   backend:
-    build: ./backend/app/
-    image: backend:master
+    # for local build
+    # build: ./backend/app/
+    # image: backend:master
+
+    # pull image from store
+    image: gcr.io/cyntegrity/backend:master
     ports:
-      - 80:3000
+      - 81:3000
     volumes:
+    # todo: change docker socket alias for your environment
       - //var/run/docker.sock:/var/run/docker.sock
-    # links:
-    #   - mongo
-    
+      # - //c/cyntegrity/backend.env:/usr/src/app/.env
+    networks:
+      - internal
+    depends_on:
+      - mongo
+
+# this image is here only to be delivered on docker host, so when pipeline run, we do not pull image interactively
   process_cli:
+    # for local build
+    # build: ./process_cli/ProcessCLI/
+    # image: processcli:master
+
+    # pull image from store
     image: gcr.io/cyntegrity/processcli:master
-    # links:
-    #   - mongo
-  
+    networks:
+      - internal
+    depends_on:
+      - mongo

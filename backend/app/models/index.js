@@ -5,8 +5,7 @@ import Pipeline from './pipeline';
 
 const connectDb = () => {
   return mongoose.connect(process.env.MONGO_CONNECTION_STRING, { 
-    useNewUrlParser: true, 
-    useCreateIndex: true,
+    dbName: process.env.MONGO_DB,
   });
 };
 const models = { User, Task, Pipeline };
