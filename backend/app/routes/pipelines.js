@@ -1,25 +1,79 @@
 import { Router } from 'express';
 import Docker from 'dockerode';
 import Streams from 'memory-streams';
+import Pipeline from '../models/pipeline';
 
 const router = Router();
-router.get('/', (req, res) => {
-  return res.send('Pipelines');
+router.get('/', async (req, res) => {
+  var tasks = await Pipeline.find().populate('children');
+  return res.json(tasks);
 });
 
-router.get('/run', async (req, res) => {
+router.post('/', async (req, res) => {
+  const userid = req.user;
+  const pipeline = new Pipeline(req.body);
+  pipeline.user = userid;
+  await pipeline.save();
+  return res.status(201).send(pipeline); 
+});
+
+router.get('/:pipelineId', async (req, res) => {
+  try {
+    var pipeline = await Pipeline.findById(req.params.pipelineId).populate('children');
+    return res.json(pipeline);
+  } catch(err) {
+    return res.send(err);
+  }
+});
+router.delete('/:pipelineId', async (req, res) => {
+  try {
+    var pipeline = await Pipeline.findByIdAndRemove(req.params.pipelineId);
+    return res.json(pipeline);
+  } catch(err) {
+    return res.send(err);
+  }
+});
+
+router.delete('/:pipelineId/task/:taskId', async (req, res) => {
+  try {
+    var pipeline = await Pipeline.findById(req.params.pipelineId).populate('children');
+    pipeline.children.remove(req.params.taskId);
+    await pipeline.save();
+    return res.json(pipeline);
+  } catch(err) {
+    return res.send(err);
+  }
+});
+
+router.post('/:pipelineId/task/:taskId', async (req, res) => {
+  try {
+    var pipeline = await Pipeline.findById(req.params.pipelineId);
+    pipeline.children.push(req.params.taskId);
+    await pipeline.save();
+    
+    var updated = await Pipeline.findById(req.params.pipelineId).populate('children');
+    return res.json(updated);
+  } catch(err) {
+    return res.send(err);
+  }
+});
+
+router.post('/:pipelineId/run', async (req, res) => {
+  const id = req.params.pipelineId;
+  // var pipeline = await Pipeline.findById(id).populate('children');
+
   var docker = new Docker({socketPath: process.env.DOCKER_SOCKET});
   
-  try {    
+  try {
     // todo: need handling of missing container, now just add container to docker-compose
     var writer = new Streams.WritableStream(); 
-    var container = await docker.run(process.env.CONTAINER_IMAGE_TO_RUN, [], writer);
+    var container = await docker.run(process.env.CONTAINER_IMAGE_TO_RUN, [id], writer);
     
     await container.wait();
     var result = writer.toString();
     await container.remove();
 
-    
+
     return res.send('Pipeline finished with result:' + result);
   } catch(err) {
     return res.send(err);

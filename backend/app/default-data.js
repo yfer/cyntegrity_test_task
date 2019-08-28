@@ -11,12 +11,24 @@ export async function fillMongoWithDefaultData() {
     avarageTimeInSeconds: 2,
     user: users[pos%size].id
   }));
+
+  const pipelines = [0,1,2,3,4].map(pos => new models.Pipeline({
+    name: users[pos%size].username + ' pipeline' + pos,
+    user: users[pos%size].id,
+    children: [
+      tasks[pos*2].id,
+      tasks[pos*2+1].id
+    ]
+  }))
+
   await models.User.insertMany(users);
   await models.Task.insertMany(tasks);
+  await models.Pipeline.insertMany(pipelines);
 }
 
 export async function clearCollections() {
   await Promise.all([
+    models.Pipeline.deleteMany({}),
     models.User.deleteMany({}),
     models.Task.deleteMany({}),
   ]);
